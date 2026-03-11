@@ -1,0 +1,680 @@
+================================================================================
+  OPENCLAW.AI — COMPLETE FEATURE ANALYSIS & BUILD GUIDE
+  Analysed from: https://openclaw.ai
+  Purpose: Build a local version (JARVIS) inspired by OpenClaw
+  Date: March 2026
+================================================================================
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  WHAT IS OPENCLAW?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+OpenClaw (formerly Clawdbot / Moltbot) is an open-source personal AI assistant
+that runs on YOUR machine and is controlled via any chat app you already use —
+WhatsApp, Telegram, Discord, Slack, Signal, or iMessage.
+
+The core idea: instead of opening a browser tab to chat with AI, you message it
+like you would a person. It lives on your computer 24/7, has persistent memory,
+can control your entire system, browse the web, write code, manage files, and
+extend itself with new skills — all through a simple chat message.
+
+Built by: Peter Steinberger (@steipete) and the open-source community
+GitHub: https://github.com/openclaw/openclaw
+Docs: https://docs.openclaw.ai
+Skills marketplace: https://clawhub.ai
+
+Sponsors: OpenAI, Vercel, Blacksmith, Convex
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  THE 6 CORE PILLARS (What Makes It Work)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. RUNS ON YOUR MACHINE
+   ─────────────────────
+   - Works on macOS, Windows, AND Linux
+   - Supports Anthropic (Claude), OpenAI (GPT), AND local models
+   - Private by default — your data never leaves your computer
+   - Can also be self-hosted on a server (Raspberry Pi, VPS, etc.)
+   - Users have run it on: Mac Mini, MacBook, Raspberry Pi, Hetzner VPS
+   - No mandatory cloud dependency
+
+   HOW TO BUILD THIS FOR JARVIS:
+   → Use Ollama to run Qwen locally on Pop!_OS
+   → Everything stays on your machine
+   → No API costs
+
+2. ANY CHAT APP (Channels / Interfaces)
+   ──────────────────────────────────────
+   OpenClaw connects to these messaging platforms as "channels":
+   - WhatsApp (via unofficial bridge — risk of ban)
+   - Telegram (official bot API — safest)
+   - Discord (official bot API)
+   - Slack (official API)
+   - Signal (via signal-cli)
+   - iMessage (macOS only)
+   - Web dashboard (browser-based control UI at localhost:18789)
+   - macOS menubar companion app (Beta)
+
+   You message it like a coworker in DMs or group chats.
+   It responds, takes actions, and reports back — all inside your chat app.
+
+   HOW TO BUILD THIS FOR JARVIS:
+   → Start with Telegram (easiest, most reliable)
+   → Add Discord second
+   → Build a local web dashboard (FastAPI + React)
+   → Skip WhatsApp (ban risk) or add it later
+
+3. PERSISTENT MEMORY
+   ──────────────────
+   - Remembers you across sessions permanently
+   - Builds a "second brain" as you chat with it
+   - Context and memory live on YOUR computer, not a server
+   - Memory persists 24/7 even when you're not talking to it
+   - Remembers preferences, past conversations, personal details
+   - Memory is searchable and can be referenced across agents
+   - Works with tools like Obsidian for note-taking integration
+
+   HOW TO BUILD THIS FOR JARVIS:
+   → ChromaDB for vector-based semantic memory (RAG)
+   → SQLite for conversation history
+   → Watchdog to index your files automatically
+   → Store memory locally in ~/.jarvis/memory/
+
+4. BROWSER CONTROL
+   ─────────────────
+   - Can browse any website
+   - Fill out forms automatically
+   - Extract data from any page
+   - Log into websites on your behalf
+   - One user had it open Google Cloud Console and configure OAuth by itself
+   - Can check flight prices, book appointments, submit reimbursements
+   - Works headlessly (invisible browser) or visibly
+
+   HOW TO BUILD THIS FOR JARVIS:
+   → Playwright (Python) for browser automation
+   → Headless Chromium for invisible browsing
+   → Add screenshot capability for vision feedback
+
+5. FULL SYSTEM ACCESS
+   ────────────────────
+   - Read and write any file on your computer
+   - Run terminal/shell commands
+   - Execute scripts (Python, Bash, etc.)
+   - Can be sandboxed (safe mode) or given full access
+   - Users have had it: shut down their PC, turn off IoT devices,
+     control smart home gadgets, manage processes
+   - Runs Claude Code / Codex loops autonomously
+   - Can fix failing tests, open PRs, deploy code — all autonomously
+
+   HOW TO BUILD THIS FOR JARVIS:
+   → subprocess module for terminal commands
+   → PyAutoGUI for mouse/keyboard control
+   → Safety layer: blacklist critical paths, require approval
+   → Dry-run mode for testing
+
+6. SKILLS & PLUGINS SYSTEM
+   ─────────────────────────
+   This is the KILLER FEATURE of OpenClaw.
+
+   Skills are like plugins — small modules that teach the AI new abilities.
+   - Community builds and shares skills on ClawHub (clawhub.ai)
+   - You can build your own skills just by describing what you want
+   - The AI can BUILD ITS OWN SKILLS — it writes and installs new skills
+     by itself based on what it needs to do
+   - Skills are hot-reloaded — no restart needed
+   - Skills can be triggered by: user messages, cron jobs (scheduled),
+     webhooks from external services, or heartbeat intervals
+   - One user asked it to "create a skill for Todoist" — it wrote and
+     installed the skill entirely on its own within Telegram chat
+
+   EXISTING COMMUNITY SKILLS (examples from user testimonials):
+   - Gmail control
+   - Google Calendar management
+   - GitHub automation
+   - Spotify control
+   - Philips Hue smart lights
+   - Obsidian notes integration
+   - Twitter/X posting
+   - WordPress management
+   - Todoist task management
+   - WHOOP fitness tracker
+   - Sentry error monitoring
+   - Flight search CLI
+   - Hetzner server management
+   - Air purifier control (IoT)
+   - VirusTotal security scanning (official partnership)
+   - Custom meditation generator with TTS + ambient audio
+   - RSS feed reader
+   - Video generation (Sora2) with watermark removal
+
+   HOW TO BUILD THIS FOR JARVIS:
+   → Create a skills/ folder with Python modules
+   → Each skill = one Python file with a standard interface
+   → Jarvis loads skills at startup and hot-reloads on changes
+   → Skills can be triggered by: chat message, cron, webhook
+   → Let Jarvis write new skills when asked
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  DETAILED FEATURE BREAKDOWN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FEATURE 1: GATEWAY SYSTEM
+──────────────────────────
+Description:
+  The "Gateway" is the central server that runs on your machine. It is the
+  brain that connects all channels (Telegram, Discord, etc.) to the AI model.
+  All messages flow through the Gateway. It runs as a background daemon/service
+  so it's always on even if you close the terminal.
+
+Technical details:
+  - Runs on port 18789 by default
+  - Built with Node.js
+  - Has a web Control UI at http://127.0.0.1:18789/
+  - Can be started as a system service (auto-starts on boot)
+  - Supports environment variables for custom config paths
+  - Commands: openclaw gateway start/stop/status
+
+How to build:
+  → FastAPI server running in background (Python)
+  → systemd service on Pop!_OS to auto-start
+  → WebSocket for real-time updates
+  → REST API for skill integration
+
+────────────────────────────────────────────────────────────────────────────────
+
+FEATURE 2: PERSONA / ONBOARDING SYSTEM
+────────────────────────────────────────
+Description:
+  When you first install OpenClaw, it runs an "onboarding wizard" that:
+  - Asks about you (name, preferences, goals, timezone, work style)
+  - Sets up the AI's personality and name (users name it Claudia, Jarvis,
+    Brosef, Ema, Shelly, etc.)
+  - Configures which channels to connect
+  - Configures which AI model to use
+  - Creates a system prompt specific to YOU
+
+  This persona is persistent — the AI knows who you are and behaves
+  consistently as "your" assistant across all sessions.
+
+How to build:
+  → First-run CLI wizard asking key questions about the user
+  → Save answers to config.yaml
+  → Generate a custom system prompt from the answers
+  → Let user name their assistant
+
+────────────────────────────────────────────────────────────────────────────────
+
+FEATURE 3: HEARTBEAT SYSTEM (Proactive AI)
+───────────────────────────────────────────
+Description:
+  This is a UNIQUE feature that most AI assistants don't have.
+  OpenClaw proactively reaches out to YOU — without being asked.
+
+  Heartbeats are scheduled background tasks that run automatically:
+  - Morning briefing: daily summary of tasks, weather, calendar, news
+  - Reminders: "Leave now, traffic is bad on your route to pickleball"
+  - Progress updates: "Running tests... 5 iterations done, still working"
+  - Proactive suggestions: "You have 3 unanswered emails from last week"
+  - Background monitoring: watches for events and notifies you
+
+  Users describe this as the feature that makes it feel "alive."
+  One user: "Apparently it checks in during heartbeats!? A kinda awesome surprise!"
+
+How to build:
+  → Python cron scheduler (APScheduler library)
+  → Each heartbeat = a scheduled function that runs and sends Telegram message
+  → Examples:
+     - Every morning at 8am: send daily briefing
+     - Every hour: check for urgent emails
+     - Every 5 minutes during a task: send progress update
+     - Every evening: summarize what was accomplished today
+
+────────────────────────────────────────────────────────────────────────────────
+
+FEATURE 4: MULTI-AGENT SUPPORT
+────────────────────────────────
+Description:
+  OpenClaw supports running multiple instances (agents) simultaneously.
+  - One user cloned their assistant and ran 3 instances concurrently
+  - Agents can communicate with each other
+  - Can spawn sub-agents for parallel tasks (e.g., Claude Code, Codex)
+  - Memory can be shared across agents
+  - Used for: running tests while answering messages, parallel research
+
+How to build:
+  → Python multiprocessing or threading
+  → Each agent = separate process with shared memory DB
+  → Message queue between agents (Redis or simple JSON queue)
+  → Start simple: one agent first, add multi-agent later
+
+────────────────────────────────────────────────────────────────────────────────
+
+FEATURE 5: SELF-MODIFICATION / SELF-IMPROVEMENT
+─────────────────────────────────────────────────
+Description:
+  This is the most mind-blowing feature of OpenClaw.
+  The AI can modify itself — write new skills, edit its own system prompt,
+  install new tools — all without you doing anything.
+
+  Real examples from users:
+  - "It combined tools in unexpected ways and added skills and made edits to
+    its own prompt that were hot-reloaded"
+  - "Claw can just keep building upon itself just by talking to it in Discord"
+  - "Asked it to build a skill for Todoist — it did and started using it"
+  - One user asked for flight search — it built a terminal CLI tool itself
+  - Another asked for WHOOP data — it figured out the API and built the skill
+  - It opened Google Cloud Console, configured OAuth, got an API key — itself
+
+  How it works:
+  - AI writes a new Python/JS skill file
+  - Saves it to the skills/ folder
+  - System hot-reloads the new skill automatically
+  - AI immediately has the new capability
+
+How to build:
+  → Give Jarvis write access to skills/ folder
+  → Create a "write_skill" tool that saves Python files
+  → Use watchdog to hot-reload new skill files
+  → Let Jarvis use Claude Code / subprocess to write and test skills
+  → Add a skill approval gate (you confirm before loading new skills)
+
+────────────────────────────────────────────────────────────────────────────────
+
+FEATURE 6: WEBHOOK / EVENT TRIGGERS
+─────────────────────────────────────
+Description:
+  OpenClaw can receive webhooks from external services and react to them.
+  This means external events trigger AI actions automatically.
+
+  Example: Sentry (error monitoring) sends a webhook when your app crashes.
+  OpenClaw receives it, reads the error, fixes the code, opens a PR — all
+  automatically without you doing anything.
+
+  Other webhook uses:
+  - GitHub PR opened → AI reviews the code
+  - Payment received → AI sends thank you email
+  - Server CPU spike → AI investigates and fixes
+  - New form submission → AI processes and responds
+
+How to build:
+  → FastAPI webhook endpoint (POST /webhook)
+  → Register the URL with external services
+  → Map webhook events to skill triggers
+  → Queue incoming webhooks for AI processing
+
+────────────────────────────────────────────────────────────────────────────────
+
+FEATURE 7: VIRUSTOTAL INTEGRATION (Security)
+─────────────────────────────────────────────
+Description:
+  OpenClaw officially partnered with VirusTotal to scan skills for malware.
+  Before installing a community skill from ClawHub, it's scanned for
+  malicious code. This ensures the skills marketplace is safe.
+
+How to build:
+  → When adding community skills, run them through a safety checker
+  → Use bandit (Python security linter) to scan skill files
+  → Require review before installing third-party skills
+
+────────────────────────────────────────────────────────────────────────────────
+
+FEATURE 8: MODEL FLEXIBILITY
+──────────────────────────────
+Description:
+  OpenClaw is model-agnostic — you choose which AI model powers it:
+  - Anthropic Claude (requires API key / Claude Max subscription)
+  - OpenAI GPT models
+  - Local models (mentioned: MiniMax M2.5, local Ollama models)
+  - Can proxy through other subscriptions (one user routed CoPilot as API)
+  - Users can switch models anytime
+
+  One user used their Claude Max subscription through OpenClaw and hit
+  rate limits, then switched to CoPilot via a proxy — all configured
+  through conversation.
+
+How to build:
+  → config.yaml model selection
+  → Ollama for local models (Qwen 8B / 3B)
+  → Support OpenAI-compatible API format
+  → Model auto-switching based on task complexity
+
+────────────────────────────────────────────────────────────────────────────────
+
+FEATURE 9: COMPANION APP (macOS Beta)
+──────────────────────────────────────
+Description:
+  A menubar app that sits in your Mac's top bar.
+  - Quick access to your assistant without opening terminal
+  - Shows status, recent messages, quick commands
+  - Requires macOS 15+, Universal Binary (Intel + Apple Silicon)
+
+How to build:
+  → System tray app using PyQt6 or Tauri (Rust)
+  → On Pop!_OS: system tray with GTK
+  → Show status indicator (online/thinking/idle)
+  → Quick chat input without opening full dashboard
+
+────────────────────────────────────────────────────────────────────────────────
+
+FEATURE 10: PAIRING / DM SAFETY
+─────────────────────────────────
+Description:
+  When you first connect a channel (e.g., Telegram), OpenClaw uses a
+  "pairing" system to verify it's really you. This prevents strangers
+  from sending commands to your assistant.
+
+  - Send a pairing code from your chat app
+  - Only paired users can control the assistant
+  - Additional approval prompts for sensitive actions
+
+How to build:
+  → Store authorized Telegram user IDs in config
+  → Require /start pairing command on first use
+  → One-time verification code
+  → Whitelist-only approach (only YOUR ID works)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  INTEGRATIONS (50+ CONFIRMED)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+COMMUNICATION:
+  - WhatsApp
+  - Telegram
+  - Discord
+  - Slack
+  - Signal
+  - iMessage (macOS only)
+
+AI MODELS:
+  - Claude (Anthropic)
+  - GPT (OpenAI)
+  - Local models (Ollama / MiniMax)
+  - GitHub Copilot (via proxy)
+
+PRODUCTIVITY:
+  - Gmail (read, write, send, unsubscribe)
+  - Google Calendar (create, check, manage)
+  - Obsidian (notes integration)
+  - Todoist (task management)
+  - Notion (likely via API)
+
+DEVELOPMENT:
+  - GitHub (PRs, issues, commits)
+  - Claude Code (autonomous coding loops)
+  - Codex CLI (code generation)
+  - Cursor (AI code editor)
+  - Manus (AI agent)
+  - Sentry (error monitoring via webhook)
+
+ENTERTAINMENT / MEDIA:
+  - Spotify (playback control)
+  - ElevenLabs (TTS / voice calls)
+  - Sora2 (video generation)
+  - YouTube (video to skill conversion)
+
+HEALTH / FITNESS:
+  - WHOOP (fitness tracker)
+  - Custom biomarker tracking
+
+SMART HOME / IOT:
+  - Philips Hue (smart lights)
+  - Winix air purifier
+  - General IoT device control
+
+WEB / CONTENT:
+  - Browser (any website)
+  - Twitter/X (posting, reading)
+  - WordPress (site management)
+  - RSS feeds
+  - Custom web scrapers
+  - Flight search (custom CLI skill)
+
+INFRASTRUCTURE:
+  - Hetzner (VPS management)
+  - Cloudflare (DNS, tunnels)
+  - Google Cloud Console (API setup)
+  - VirusTotal (security scanning)
+
+FINANCE:
+  - Credit card access (one user gave it their card)
+  - Health reimbursement submissions
+  - Insurance claim management (accidental but effective)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  TECHNICAL ARCHITECTURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+INSTALLATION:
+  - Primary: npm package (npm i -g openclaw)
+  - One-liner: curl | bash (installs Node.js automatically)
+  - Hackable: git clone from GitHub, build from source
+  - Platform: macOS, Windows, Linux
+
+CORE TECH STACK:
+  - Runtime: Node.js (v22+)
+  - Package manager: pnpm
+  - Gateway: Local HTTP server (port 18789)
+  - Config: YAML files
+  - State: Local filesystem
+
+KEY ENVIRONMENT VARIABLES:
+  - OPENCLAW_HOME: sets home directory
+  - OPENCLAW_STATE_DIR: overrides state directory
+  - OPENCLAW_CONFIG_PATH: overrides config file path
+
+SETUP COMMANDS:
+  - openclaw onboard            → First-time setup wizard
+  - openclaw gateway start/stop → Control the background service
+  - openclaw gateway status     → Check if running
+  - openclaw dashboard          → Open web UI
+  - openclaw message send       → Send a message programmatically
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  WHAT MAKES IT DIFFERENT FROM OTHER AI ASSISTANTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+vs ChatGPT / Claude.ai:
+  + Lives on your machine (not a browser tab)
+  + Runs 24/7 as a background service
+  + Controls your actual computer
+  + Works via WhatsApp/Telegram (no app to open)
+  + Persistent memory that builds over time
+  + Can self-modify and add new skills
+  + Proactively contacts you (heartbeats)
+  + 100% free if using local models
+
+vs Other agent frameworks (AutoGPT, AgentGPT):
+  + Actually works reliably
+  + Designed for personal use, not just demos
+  + Connects to real messaging apps
+  + Community-built skills ecosystem
+  + Simple enough for non-technical users
+  + Open source and hackable
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  HOW TO BUILD JARVIS (YOUR VERSION) — FEATURE BY FEATURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PHASE 1 — CORE (Week 1-2):
+  [1] Gateway Server
+      Tool: FastAPI + uvicorn
+      What: Background server that runs always, handles all requests
+      File: gateway/server.py
+
+  [2] Local LLM
+      Tool: Ollama + Qwen 8B/3B
+      What: AI brain that processes all messages
+      File: brain/llm.py
+
+  [3] Telegram Channel
+      Tool: python-telegram-bot
+      What: Chat interface — send commands, get responses
+      File: comms/telegram_bot.py
+
+  [4] Persistent Memory
+      Tool: ChromaDB + SQLite
+      What: Remember everything across sessions
+      File: memory/rag.py + memory/history.py
+
+PHASE 2 — SKILLS SYSTEM (Week 3):
+  [5] Skills Loader
+      Tool: Python importlib + watchdog
+      What: Load, hot-reload, and run skill modules
+      File: skills/loader.py
+
+  [6] First Skills
+      - file_manager.py (organize files)
+      - web_search.py (DuckDuckGo)
+      - gmail_skill.py (read/send email)
+      - github_skill.py (auto commits/README)
+
+  [7] Self-Writing Skills
+      Tool: Subprocess + file write
+      What: Let Jarvis write new skill files when asked
+      File: skills/creator.py
+
+PHASE 3 — PROACTIVE FEATURES (Week 4):
+  [8] Heartbeat System
+      Tool: APScheduler
+      What: Scheduled tasks that run and message you
+      File: scheduler/heartbeats.py
+      Examples:
+        - 8am: daily briefing
+        - Hourly: email check
+        - Evening: day summary
+
+  [9] Webhook Receiver
+      Tool: FastAPI POST endpoint
+      What: Receive events from GitHub, Sentry, etc.
+      File: gateway/webhooks.py
+
+  [10] Web Dashboard
+       Tool: FastAPI + React (or simple HTML)
+       What: Browser UI to chat and monitor status
+       File: dashboard/
+
+PHASE 4 — ADVANCED (Month 2+):
+  [11] Browser Control
+       Tool: Playwright
+       File: actions/browser.py
+
+  [12] Computer Control
+       Tool: PyAutoGUI + xdotool
+       File: actions/computer.py
+
+  [13] Voice Interface
+       Tool: Whisper (input) + Piper TTS (output)
+       File: senses/voice.py
+
+  [14] Discord Channel
+       Tool: discord.py
+       File: comms/discord_bot.py
+
+  [15] Persona Onboarding
+       Tool: CLI wizard (Click or Typer library)
+       File: setup/onboard.py
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  YOUR ADVANTAGE OVER OPENCLAW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+OpenClaw requires:
+  - Node.js v22+ (JavaScript ecosystem)
+  - Anthropic/OpenAI API key (costs money)
+  - macOS for some features (menubar app)
+
+YOUR Jarvis:
+  + Python (more AI/ML libraries available)
+  + Qwen 8B/3B via Ollama (completely FREE)
+  + Works perfectly on Pop!_OS (Linux)
+  + No API costs ever
+  + More control over the AI (local = no rate limits)
+  + Can use vision models (LLaVA) for screen reading
+  + Can integrate with more Linux-native tools
+
+This makes YOUR version genuinely better for:
+  - Privacy (everything local)
+  - Cost (zero ongoing cost)
+  - Linux users (Pop!_OS native)
+  - Customization (Python = easier to modify)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  SKILLS ARCHITECTURE (HOW TO BUILD THE PLUGIN SYSTEM)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Each skill = one Python file with this standard structure:
+
+  # skills/example_skill.py
+
+  SKILL_NAME = "example"
+  SKILL_DESCRIPTION = "What this skill does"
+  SKILL_TRIGGERS = ["keyword1", "keyword2"]  # words that activate this skill
+
+  def run(input: str, context: dict) -> str:
+      # Do the thing
+      result = do_something(input)
+      return f"Done: {result}"
+
+  def schedule() -> dict:
+      # Optional: run on a schedule
+      return {"interval": "1h", "action": "check_emails"}
+
+The skills loader:
+  - Scans skills/ folder at startup
+  - Imports each skill file
+  - Registers skill triggers with the brain
+  - When a message matches a trigger, runs the skill
+  - Watchdog detects new/modified skill files → hot-reload
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  KEY DIFFERENCES: OPENCLAW vs YOUR JARVIS BUILD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Feature               OpenClaw         Your JARVIS
+──────────────────────────────────────────────────────────
+Language              Node.js          Python
+AI Model              Claude/GPT/Local Qwen 8B/3B (free)
+Cost                  API fees         Zero
+OS Support            Mac/Win/Linux    Pop!_OS (Linux)
+Memory                Custom           ChromaDB + SQLite
+Skills                JavaScript       Python modules
+Channels              WhatsApp+more    Telegram first
+Voice                 Not built-in     Whisper + Piper
+Screen vision         Not built-in     LLaVA model
+Heartbeats            Yes              APScheduler
+Self-modification     Yes              Planned Phase 4
+Web dashboard         Yes (port 18789) FastAPI + React
+Marketplace           ClawHub          GitHub (your own)
+Privacy               Local option     100% local always
+Open source           Yes (GitHub)     Yes (your GitHub)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  SUMMARY: FEATURES TO PRIORITIZE BUILDING FIRST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+MUST BUILD (core — OpenClaw has all of these):
+  1. Gateway server (always-running background process)
+  2. Telegram channel (message interface)
+  3. Persistent memory (RAG + conversation history)
+  4. Skills system (plugin architecture with hot-reload)
+  5. Heartbeat / proactive messaging
+  6. Browser control (Playwright)
+  7. File system access (read/write/organize)
+  8. Shell command execution (with safety guardrails)
+  9. Persona onboarding (first-run wizard)
+  10. Web dashboard (local browser UI)
+
+NICE TO HAVE (differentiators from OpenClaw):
+  11. Voice input (Whisper) — OpenClaw doesn't have this built-in
+  12. Voice output (Piper TTS) — OpenClaw uses ElevenLabs (paid)
+  13. Screen vision (LLaVA) — unique to your local setup
+  14. Self-writing skills — advanced but powerful
+  15. Discord channel — easy to add after Telegram
+  16. Job application bot — unique to your use case
+  17. GitHub automator — great for portfolio
+
+================================================================================
+  END OF ANALYSIS
+  Source: https://openclaw.ai + https://docs.openclaw.ai
+  Build your version: JARVIS — Local, Free, Python, Pop!_OS
+================================================================================
